@@ -1,0 +1,168 @@
+{% extends 'inventario/base.html' %}
+
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>Inventario de Productos</h2>
+
+    <a href="{% url 'inventario:crear' %}" class="btn btn-calcifer">
+        + Nuevo Producto
+    </a>
+
+</div>
+<div class="card mb-4">
+    <div class="card-body">
+
+        <form method="GET">
+
+            <div class="row">
+
+                <div class="col-md-10">
+
+                    <input
+                        type="text"
+                        name="buscar"
+                        class="form-control"
+                        placeholder="Buscar producto, marca, categoría o color..."
+                        value="{{ buscar }}"
+                    >
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <button type="submit"
+                            class="btn btn-calcifer w-100">
+                        Buscar
+                    </button>
+
+                </div>
+                 <a href="{% url 'inventario:lista' %}"
+                    class="btn btn-secondary w-100 mt-2">
+                    Limpiar
+                </a>   
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<table class="table table-striped table-hover align-middle">
+
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Marca</th>
+            <th>Cantidad</th>
+            <th>Precio Venta</th>
+            <th>Ubicación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for producto in productos %}
+
+        <tr>
+
+            <td>{{ producto.id }}</td>
+
+            <td>{{ producto.nombre }}</td>
+
+            <td>{{ producto.categoria.nombre }}</td>
+
+            <td>{{ producto.marca.nombre }}</td>
+
+            <td>{{ producto.cantidad }}</td>
+
+            <td>${{ producto.precio_punto_fisico }}</td>
+
+            <td>{{ producto.ubicacion }}</td>
+
+            <td class="text-end">
+
+                <a href="{% url 'inventario:editar' producto.pk %}"
+                   class="btn btn-sm btn-outline-primary">
+                    Editar
+                </a>
+
+                <form method="post"
+                      action="{% url 'inventario:eliminar' producto.pk %}"
+                      class="d-inline"
+                      onsubmit="return confirm('¿Eliminar el producto {{ producto.nombre }}?');">
+
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="btn btn-sm btn-outline-danger">
+                        Eliminar
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+            <td colspan="8" class="text-center text-muted">
+                No existen productos registrados.
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% if productos.paginator.num_pages > 1 %}
+
+<nav>
+
+    <ul class="pagination justify-content-center">
+
+        {% if productos.has_previous %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ productos.previous_page_number }}">
+               Anterior
+            </a>
+        </li>
+
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Página {{ productos.number }}
+                de
+                {{ productos.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if productos.has_next %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ productos.next_page_number }}">
+               Siguiente
+            </a>
+        </li>
+
+        {% endif %}
+
+    </ul>
+
+</nav>
+
+{% endif %}
+
+{% endblock %}
